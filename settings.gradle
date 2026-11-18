@@ -1,0 +1,4 @@
+// Each Minecraft version is an independent Gradle build under versions/<name>/ (different Java,
+// ForgeGradle and API per version), so there is intentionally no multi-project include here.
+// Build one version:  cd versions/forge-1.20.1 && gradle build
+rootProject.name = 'ChatAI'

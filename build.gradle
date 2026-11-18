@@ -1,0 +1,2 @@
+// Root build is intentionally empty. See versions/<name>/build.gradle and README.md.
+// The shared, Minecraft-free parser lives in core/ and is compiled into every version's jar.

@@ -1,0 +1,27 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+displayTest="IGNORE_SERVER_VERSION"
+
+[[mods]]
+modId="chataiagent"
+version="${mod_version}"
+displayName="ChatAI Agent"
+logoFile="icon.png"
+description='''Control the world from chat: type "AI <your wish>" (Russian or English).
+Built-in rule-based parser (works offline, it is NOT an AI model); optional Claude API.
+Server-authoritative, with permissions, cooldown, limits and confirmation of big changes.'''
+
+[[dependencies.chataiagent]]
+modId="forge"
+mandatory=true
+versionRange="[47,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.chataiagent]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20.1,1.21)"
+ordering="NONE"
+side="BOTH"

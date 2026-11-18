@@ -1,0 +1,47 @@
+// ChatAI - Forge 1.20.1 (ForgeGradle 6, official Mojang mappings, Java 17, Gradle 8.1.1)
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '[6.0.16,6.2)', changing: true
+    }
+}
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'java'
+
+group = 'com.chatai'
+version = "${minecraft_version}-${mod_version}"
+base { archivesName = 'ChatAI-agent-forge' }
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+// shared, Minecraft-free parser/limits/messages
+sourceSets.main.java.srcDir '../../core/src/main/java'
+
+minecraft {
+    mappings channel: 'official', version: minecraft_version
+    runs {
+        client { workingDirectory project.file('run'); property 'forge.logging.console.level', 'debug'
+            mods { chataiagent { source sourceSets.main } } }
+        server { workingDirectory project.file('run-server'); args '--nogui'
+            mods { chataiagent { source sourceSets.main } } }
+    }
+}
+
+repositories { mavenCentral() }
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+}
+
+processResources {
+    inputs.property 'mod_version', mod_version
+    filesMatching('META-INF/mods.toml') { expand 'mod_version': mod_version }
+}
+
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+
+jar { manifest { attributes 'Implementation-Title': 'ChatAI', 'Implementation-Version': mod_version } }
+jar.finalizedBy('reobfJar')
