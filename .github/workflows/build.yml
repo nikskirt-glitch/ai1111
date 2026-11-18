@@ -1,0 +1,57 @@
+name: Build ChatAI mod
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  core-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - name: Parser self test
+        run: |
+          mkdir -p out
+          javac -encoding UTF-8 --release 17 -d out $(find core/src -name '*.java')
+          java -Dfile.encoding=UTF-8 -cp out com.chatai.core.ParserSelfTest
+      - name: AI protocol test
+        run: |
+          curl -sSL -o gson.jar https://repo1.maven.org/maven2/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar
+          mkdir -p out2
+          javac -encoding UTF-8 --release 17 -cp gson.jar -d out2 $(find core/src/main -name '*.java') versions/forge-1.20.1-agent/src/main/java/com/chatai/forge/AgentProtocol.java tests/com/chatai/forge/AgentProtocolTest.java
+          java -Dfile.encoding=UTF-8 -cp out2:gson.jar com.chatai.forge.AgentProtocolTest
+
+  forge-1-20-1:
+    needs: core-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.1.1' }
+      - name: Build 1.20.1
+        working-directory: versions/forge-1.20.1
+        run: gradle build --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ChatAI-forge-1.20.1
+          path: versions/forge-1.20.1/build/libs/*.jar
+
+  forge-1-20-1-agent:
+    needs: core-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.1.1' }
+      - name: Build 1.20.1 agent
+        working-directory: versions/forge-1.20.1-agent
+        run: gradle build --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ChatAI-agent-forge-1.20.1
+          path: versions/forge-1.20.1-agent/build/libs/*.jar
